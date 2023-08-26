@@ -1,0 +1,5 @@
+1.Open "dist"folder > "app"folder > find "app.exe" and start it
+
+2.Open a browser and enter the URL:127.0.0.1:5000
+
+Do not close app.exe while using the website

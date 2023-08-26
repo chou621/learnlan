@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Categories</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Your existing styles here */
+
+        /* Additional styles for category cards */
+        .category-card {
+            max-width: 250px;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Your existing content here -->
+
+    <div class="container">
+        <h1><i class="fas fa-tags"></i> Categories</h1>
+        <div class="row" id="categoryContainer">
+            <!-- Category cards will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <script>
+        const categories = [
+            { id: 1, name: "Category 1" },
+            { id: 2, name: "Category 2" },
+            { id: 3, name: "Category 3" }
+            // Add more categories as needed
+        ];
+
+        function generateCategories() {
+            const categoryContainer = document.getElementById("categoryContainer");
+            categoryContainer.innerHTML = "";
+
+            categories.forEach((category) => {
+                const categoryCard = document.createElement("div");
+                categoryCard.classList.add("category-card", "col-md-4");
+                categoryCard.innerHTML = `
+                    <div class="category-name">${category.name}</div>
+                    <div class="category-buttons">
+                        <button class="btn btn-info" onclick="editCategory(${category.id})">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteCategory(${category.id})">Delete</button>
+                    </div>
+                `;
+                categoryContainer.appendChild(categoryCard);
+            });
+        }
+
+        function editCategory(categoryId) {
+            // Implement editing logic here
+            console.log(`Editing category with ID ${categoryId}`);
+        }
+
+        function deleteCategory(categoryId) {
+            // Implement deletion logic here
+            console.log(`Deleting category with ID ${categoryId}`);
+        }
+
+        // Generate initial categories
+        generateCategories();
+    </script>
+</body>
+</html>
