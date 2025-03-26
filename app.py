@@ -26,8 +26,18 @@ conn.commit()
 
 @app.route("/")
 def index():
-    cur.execute("SELECT * FROM quiz_table ORDER BY id DESC")
-    quizzes = cur.fetchall()
+    cur.execute("SELECT * FROM quiz_table")
+    rows = cur.fetchall()
+    quizzes = [
+        {
+            "id": row[0],
+            "language": row[1],
+            "question": row[2],
+            "answer": row[3],
+            "timestamp": row[4],
+        }
+        for row in rows
+    ]
     return render_template("index.html", quizzes=quizzes)
 
 
@@ -52,6 +62,30 @@ def add():
 @app.route("/add")
 def add_page():
     return render_template("add_quiz.html")
+
+
+@app.route("/play_audio/<question>")
+def play_audio(question):
+    from gtts import gTTS
+    import tempfile
+
+    # 先查出這個 question 的語言
+    cur.execute("SELECT language FROM quiz_table WHERE question = %s", (question,))
+    result = cur.fetchone()
+    if not result:
+        return "Question not found", 404
+
+    language = result[0]
+
+    # 產生語音
+    tts = gTTS(question, lang=language)
+
+    # 建立暫存檔
+    temp = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
+    tts.save(temp.name)
+    temp.close()
+
+    return send_file(temp.name, mimetype="audio/mpeg")
 
 
 if __name__ == "__main__":
