@@ -59,6 +59,53 @@ def add():
         return jsonify({"success": False, "error": str(e)})
 
 
+@app.route("/delete/<question>", methods=["DELETE"])
+def delete_question(question):
+    cur.execute("DELETE FROM quiz_table WHERE question=%s", (question,))
+    conn.commit()
+    return jsonify({"success": True})
+
+
+# 檢查問題是否重複
+@app.route("/check_duplicate/<question>")
+def check_duplicate(question):
+    cur.execute("SELECT COUNT(*) FROM quiz_table WHERE question = %s", (question,))
+    count = cur.fetchone()[0]
+    return jsonify({"exists": count > 0})
+
+
+# 刪除多個問題
+@app.route("/delete_multiple", methods=["POST"])
+def delete_multiple():
+    data = request.get_json()
+    questions = data.get("questions", [])
+    try:
+        cur.executemany(
+            "DELETE FROM quiz_table WHERE question = %s", [(q,) for q in questions]
+        )
+        conn.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        print("Delete multiple error:", e)
+        return jsonify({"success": False, "error": str(e)})
+
+
+@app.route("/update/<original_question>", methods=["PUT"])
+def update_question(original_question):
+    data = request.get_json()
+    language = data.get("language")
+    question = data.get("question")
+    answer = data.get("answer")
+    timestamp = datetime.now()
+
+    cur.execute(
+        "UPDATE quiz_table SET language=%s, question=%s, answer=%s, timestamp=%s WHERE question=%s",
+        (language, question, answer, timestamp, original_question),
+    )
+    conn.commit()
+    return jsonify({"success": True})
+
+
 @app.route("/add")
 def add_page():
     return render_template("add_quiz.html")
