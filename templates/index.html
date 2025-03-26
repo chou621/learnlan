@@ -115,18 +115,21 @@
                     {% for quiz in quizzes %}
                     <tr data-question="{{ quiz.question }}">
                         <td class="align-middle" style="background-color:#E6F7FF;">
-                            <label class="form-check-label" for="checkbox{{ index_start + loop.index0 }}" style="width: 100%; height: 100%; margin: 0; padding: 0;">
-                                <input type="checkbox" class="form-check-input selectCheckbox" id="checkbox{{ index_start + loop.index0 }}" data-index="{{ index_start + loop.index0 }}" style="margin: 0;">
+                            <label class="form-check-label" for="checkbox{{ loop.index0 }}" style="width: 100%; height: 100%; margin: 0; padding: 0;">
+                                <input type="checkbox" class="form-check-input selectCheckbox" id="checkbox{{ loop.index0 }}" data-index="{{ loop.index0 }}" style="margin: 0;">
                             </label>
                         </td>
-                        <td id="question{{ index_start + loop.index0 }}" class="align-middle question-column"><label class="sound-text" onclick="playAudio('{{ quiz.question }}')">{{ quiz.question }}<i class="fas fa-volume-up sound-icon" ></i></label></td>
-                        <td id="answer{{ index_start + loop.index0 }}" class="align-middle answer-column">{{ quiz.answer }}</td>
-                        <td class="align-middle">
-                            <button class="btn btn-danger btn-sm" onclick="confirmDelete('{{ index_start + loop.index0 }}', '{{ quiz.question }}', '{{ quiz.answer}}')">Delete</button>
-                            <!-- Use Bootstrap Modal component for editing -->
-                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal{{ index_start + loop.index0 }}">Edit</button>
+                        <td id="question{{ loop.index0 }}" class="align-middle question-column">
+                            <label class="sound-text" onclick="playAudio('{{ quiz.question }}')">
+                                {{ quiz.question }}<i class="fas fa-volume-up sound-icon" ></i>
+                            </label>
                         </td>
-                    </tr>
+                        <td id="answer{{ loop.index0 }}" class="align-middle answer-column">{{ quiz.answer }}</td>
+                        <td class="align-middle">
+                            <button class="btn btn-danger btn-sm" onclick="confirmDelete('{{ loop.index0 }}', '{{ quiz.question }}', '{{ quiz.answer}}')">Delete</button>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal{{ loop.index0 }}">Edit</button>
+                        </td>
+                    </tr>                    
                         <!-- Edit Modal -->
                         <div class="modal" id="editModal{{ index_start + loop.index0 }}" tabindex="-1" aria-labelledby="editModalLabel{{ index_start + loop.index0 }}" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
