@@ -50,28 +50,23 @@ def add():
         )
         conn.commit()
         return redirect(url_for("index"))
-    return render_template("add.html")
+    return render_template("add_quiz.html")
 
 
-# 修改問題頁面
-@app.route("/edit/<int:id>", methods=["GET", "POST"])
-def edit(id):
-    if request.method == "POST":
-        language = request.form["language"]
-        question = request.form["question"]
-        answer = request.form["answer"]
-        timestamp = datetime.now()
+# 修改問題頁面，已移除 edit.html，將編輯功能放到 index.html 中
+@app.route("/update/<int:id>", methods=["POST"])
+def update(id):
+    language = request.form["language"]
+    question = request.form["question"]
+    answer = request.form["answer"]
+    timestamp = datetime.now()
 
-        cur.execute(
-            "UPDATE quiz_table SET language=%s, question=%s, answer=%s, timestamp=%s WHERE id=%s",
-            (language, question, answer, timestamp, id),
-        )
-        conn.commit()
-        return redirect(url_for("index"))
-
-    cur.execute("SELECT * FROM quiz_table WHERE id=%s", (id,))
-    question = cur.fetchone()
-    return render_template("edit.html", question=question)
+    cur.execute(
+        "UPDATE quiz_table SET language=%s, question=%s, answer=%s, timestamp=%s WHERE id=%s",
+        (language, question, answer, timestamp, id),
+    )
+    conn.commit()
+    return redirect(url_for("index"))
 
 
 # 刪除問題
