@@ -1,331 +1,58 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>Add New Question</title>
-    <!-- 引入Bootstrap的CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Add Quiz</title>
 </head>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-        background-color: #f4f6f9;
-        min-height: 100vh;
-    }
-
-    .main-container {
-        max-width: 800px;
-        margin: 0 auto;
-    }
-
-    .container {
-        background-color: #fff;
-        border-radius: 10px;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-
-    h1 {
-        color: #007BFF;
-        margin-bottom: 20px;
-        text-align: center;
-    }
-
-    form {
-        width: 100%;
-    }
-
-    label {
-        display: block;
-        margin-top: 10px;
-        font-weight: bold;
-    }
-
-    input[type="text"],
-    select {
-        width: 100%;
-        padding: 10px;
-        font-size: 16px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-
-    .btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: background-color 0.3s ease-in-out;
-    }
-
-    .btn-primary {
-        background-color: #007BFF;
-        color: #fff;
-    }
-
-    .btn-primary:hover {
-        background-color: #0056b3;
-    }
-
-    .btn-secondary {
-        background-color: #6c757d;
-        color: #fff;
-    }
-
-    .btn-secondary:hover {
-        background-color: #545b62;
-    }
-
-    .added-words-container {
-        margin-top: 30px;
-    }
-
-    .word-card {
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 5px;
-        padding: 15px;
-        margin-bottom: 10px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .word-info {
-        flex-grow: 1;
-    }
-
-    .word-actions {
-        display: flex;
-        gap: 10px;
-    }
-
-    .btn-action {
-        padding: 5px 10px;
-        border-radius: 3px;
-        cursor: pointer;
-        border: none;
-    }
-
-    .btn-delete {
-        background-color: #dc3545;
-        color: white;
-    }
-
-    .success-message {
-        color: #28a745;
-        margin-top: 10px;
-    }
-
-    .error-message {
-        color: #dc3545;
-        margin-top: 10px;
-    }
-
-    .text-center {
-        text-align: center;
-        margin-top: 20px;
-    }
-</style>
-</head>
-
 <body>
-    <div class="main-container">
-        <div class="container">
-            <h1><i class="fas fa-plus-circle"></i> Add New Question</h1>
-            <form id="addQuizForm" action="/add" method="post">
-                <div class="form-group">
-                    <label for="language">Language:</label>
-                    <select class="form-control" id="language" name="language">
-                        <option value="af">Afrikaans </option>
-                        <option value="ar">Arabic </option>
-                        <option value="zh-CN">Chinese (People's Republic of China) </option>
-                        <option value="zh-TW">Chinese (Taiwan) </option>
-                        <option value="en-US">English (United States) </option>
-                        <option value="fr-FR">French (France) </option>
-                        <option value="de">German (Germany) </option>
-                        <option value="hi">Hindi (India) </option>
-                        <option value="id">Indonesian </option>
-                        <option value="it">Italian (Italy) </option>
-                        <option value="ja">Japanese (Japan) </option>
-                        <option value="ko">Korean (Korea) </option>
-                        <option value="ms">Malaysian </option>
-                        <option value="pl">Polish </option>
-                        <option value="pt-BR">Portuguese (Brazil) </option>
-                        <option value="ru">Russian (Russia) </option>
-                        <option value="es-ES">Spanish (Spain) </option>
-                        <option value="sv">Swedish </option>
-                        <option value="th">Thai(Thailand) </option>
-                        <option value="tr">Turkish </option>
-                        <option value="uk">Ukrainian </option>
-                        <option value="vi">Vietnamese </option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Question:</label>
-                    <input class="form-control" type="text" name="question" id="question" required>
-                    <div id="message" class="error-message"></div>
-                </div>
-                <div class="form-group">
-                    <label>Correct Answer:</label>
-                    <input type="text" class="form-control" id="answer" name="answer" required>
-                </div>
-                <div class="text-center">
-                    <a class="btn btn-secondary" href="/">Back</a>
-                    <button type="submit" class="btn btn-primary" id="Add_question">Add</button>
-                </div>
-            </form>
-        </div>
+    <h1>Add New Quiz</h1>
+    <form id="quizForm">
+        <label>Language:</label>
+        <select id="language">
+            <option value="zh-TW">Chinese (Taiwan)</option>
+            <option value="en-US">English</option>
+            <option value="ko">Korean</option>
+        </select><br><br>
 
-        <div class="container added-words-container">
-            <h2 class="mb-4">Recently Added Words</h2>
-            <div id="addedWordsList"></div>
-        </div>
-    </div>
+        <label>Question:</label>
+        <input type="text" id="question" required><br><br>
 
-<script>
-    // 语言选择相关代码
-    const languageDropdown = document.getElementById("language");
-    
-    // 从 URL 获取语言参数
-    window.addEventListener("load", function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const languageParam = urlParams.get('language');
-        if (languageParam) {
-            languageDropdown.value = languageParam;
-        } else {
-            // 如果没有 URL 参数，则使用本地存储的语言
-            const lastSelectedLanguage = localStorage.getItem("lastSelectedLanguage");
-            if (lastSelectedLanguage) {
-                languageDropdown.value = lastSelectedLanguage;
-            }
-        }
-    });
+        <label>Answer:</label>
+        <input type="text" id="answer" required><br><br>
 
-    // 保存语言选择
-    languageDropdown.addEventListener("change", function () {
-        const selectedLanguage = languageDropdown.value;
-        localStorage.setItem("lastSelectedLanguage", selectedLanguage);
-    });
+        <button type="submit">Add</button>
+    </form>
+    <p id="result"></p>
 
-    // 检查重复题目
-    function checkDuplicateQuestion(question) {
-        return fetch(`/check_duplicate/${encodeURIComponent(question)}`)
-            .then(response => response.json())
-            .then(data => data.exists)
-            .catch(error => {
-                console.error('Error:', error);
-                return false;
-            });
-    }
-
-    document.getElementById("question").addEventListener("input", function () {
-        const question = this.value.trim();
-        const messageElement = document.getElementById("message");
-        messageElement.textContent = "";
-
-        if (question === "" || question.length < 2) {
-            return;
-        }
-
-        checkDuplicateQuestion(question)
-            .then(exists => {
-                if (exists) {
-                    messageElement.textContent = "该问题已存在，请输入不同的内容。";
-                    document.getElementById("Add_question").disabled = true;
-                } else {
-                    document.getElementById("Add_question").disabled = false;
-                }
-            });
-    });
-
-    // 表单提交处理
-    document.getElementById("addQuizForm").addEventListener("submit", function(e) {
+    <script>
+    document.getElementById("quizForm").addEventListener("submit", function(e) {
         e.preventDefault();
-        
-        const formData = new FormData(this);
-        const question = formData.get("question");
-        const answer = formData.get("answer");
-        const language = formData.get("language");
-        
-        fetch('/add', {
-            method: 'POST',
-            body: formData
+
+        const language = document.getElementById("language").value;
+        const question = document.getElementById("question").value;
+        const answer = document.getElementById("answer").value;
+
+        fetch("/add", {
+            method: "POST",
+            headers: {{
+                "Content-Type": "application/json"
+            }},
+            body: JSON.stringify({{ language, question, answer }})
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // 添加新单词到列表
-                addWordToList({
-                    question: question,
-                    answer: answer,
-                    language: language
-                });
-                
-                // 清空表单
-                this.reset();
-                // 保持当前选择的语言
-                document.getElementById('language').value = language;
-                // 显示成功消息
-                alert('添加成功！');
-                // 将焦点设置到问题输入框
-                document.getElementById('question').focus();
-            } else {
-                alert(data.message || '添加失败，请重试');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('添加失败，请重试');
-        });
+        .then(res => res.json())
+        .then(data => {{
+            if (data.success) {{
+                document.getElementById("result").innerText = "✅ 新增成功！自動返回首頁...";
+                setTimeout(() => {{
+                    window.location.href = "/";
+                }}, 1500);
+            }} else {{
+                document.getElementById("result").innerText = "❌ 新增失敗：" + (data.error || "請稍後再試");
+            }}
+        }})
+        .catch(err => {{
+            document.getElementById("result").innerText = "❌ 錯誤：" + err;
+        }});
     });
-
-    // 添加单词到列表
-    function addWordToList(quiz) {
-        const addedWordsList = document.getElementById("addedWordsList");
-        const wordCard = document.createElement("div");
-        wordCard.className = "word-card";
-        wordCard.innerHTML = `
-            <div class="word-info">
-                <strong>${quiz.question}</strong> - ${quiz.answer}
-            </div>
-            <div class="word-actions">
-                <button class="btn-action btn-delete" onclick="deleteWord(this)">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-        `;
-        addedWordsList.insertBefore(wordCard, addedWordsList.firstChild);
-    }
-
-    // 删除单词
-    function deleteWord(button) {
-        if (confirm('确定要删除这个单词吗？')) {
-            const wordCard = button.closest(".word-card");
-            const question = wordCard.querySelector(".word-info strong").textContent;
-            
-            fetch(`/delete/${encodeURIComponent(question)}`, {
-                method: "DELETE"
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    wordCard.remove();
-                } else {
-                    alert('删除失败，请重试');
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                alert('删除失败，请重试');
-            });
-        }
-    }
-</script>
+    </script>
 </body>
 </html>
