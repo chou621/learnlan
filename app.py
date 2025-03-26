@@ -53,20 +53,33 @@ def add():
     return render_template("add_quiz.html")
 
 
-# 修改問題頁面，已移除 edit.html，將編輯功能放到 index.html 中
-@app.route("/update/<int:id>", methods=["POST"])
-def update(id):
-    language = request.form["language"]
-    question = request.form["question"]
-    answer = request.form["answer"]
+@app.route("/check_duplicate/<question>")
+def check_duplicate(question):
+    try:
+        cur.execute("SELECT * FROM quiz_table WHERE question = %s", (question,))
+        existing = cur.fetchone()
+        if existing:
+            return jsonify({"exists": True})
+        else:
+            return jsonify({"exists": False})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/update/<path:old_question>", methods=["PUT"])
+def update_quiz_by_question(old_question):
+    data = request.get_json()
+    new_question = data.get("question")
+    answer = data.get("answer")
+    language = data.get("language")
     timestamp = datetime.now()
 
     cur.execute(
-        "UPDATE quiz_table SET language=%s, question=%s, answer=%s, timestamp=%s WHERE id=%s",
-        (language, question, answer, timestamp, id),
+        "UPDATE quiz_table SET language=%s, question=%s, answer=%s, timestamp=%s WHERE question=%s",
+        (language, new_question, answer, timestamp, old_question),
     )
     conn.commit()
-    return redirect(url_for("index"))
+    return jsonify({"success": True})
 
 
 # 刪除問題
