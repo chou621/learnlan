@@ -24,35 +24,39 @@
     <p id="result"></p>
 
     <script>
-    document.getElementById("quizForm").addEventListener("submit", function(e) {
-        e.preventDefault();
-
-        const language = document.getElementById("language").value;
-        const question = document.getElementById("question").value;
-        const answer = document.getElementById("answer").value;
-
-        fetch("/add", {
-            method: "POST",
-            headers: {{
-                "Content-Type": "application/json"
-            }},
-            body: JSON.stringify({{ language, question, answer }})
-        })
-        .then(res => res.json())
-        .then(data => {{
-            if (data.success) {{
-                document.getElementById("result").innerText = "✅ 新增成功！自動返回首頁...";
-                setTimeout(() => {{
-                    window.location.href = "/";
-                }}, 1500);
-            }} else {{
-                document.getElementById("result").innerText = "❌ 新增失敗：" + (data.error || "請稍後再試");
-            }}
-        }})
-        .catch(err => {{
-            document.getElementById("result").innerText = "❌ 錯誤：" + err;
-        }});
-    });
-    </script>
-</body>
+        document.getElementById("quizForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+        
+            const language = document.getElementById("language").value;
+            const question = document.getElementById("question").value;
+            const answer = document.getElementById("answer").value;
+        
+            fetch("/add", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    language: language,
+                    question: question,
+                    answer: answer
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById("result").innerText = "✅ 新增成功！自動返回首頁...";
+                    setTimeout(() => {
+                        window.location.href = "/";
+                    }, 1500);
+                } else {
+                    document.getElementById("result").innerText = "❌ 新增失敗：" + (data.error || "請稍後再試");
+                }
+            })
+            .catch(err => {
+                document.getElementById("result").innerText = "❌ 錯誤：" + err;
+            });
+        });
+        </script>
+        </body>
 </html>
