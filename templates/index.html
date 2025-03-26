@@ -131,19 +131,19 @@
                         </td>
                     </tr>                    
                         <!-- Edit Modal -->
-                        <div class="modal" id="editModal{{ index_start + loop.index0 }}" tabindex="-1" aria-labelledby="editModalLabel{{ index_start + loop.index0 }}" aria-hidden="true">
+                        <div class="modal" id="editModal{{ loop.index0 }}" tabindex="-1" aria-labelledby="editModalLabel{{ loop.index0 }}" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
                                  <div class="modal-header">
-                                    <h5 class="modal-title" id="editModalLabel{{ index_start + loop.index0 }}">编辑单词</h5>
+                                    <h5 class="modal-title" id="editModalLabel{{ loop.index0 }}">编辑单词</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
                                     <!-- Edit Form -->
-                                    <form id="editForm{{ index_start + loop.index0 }}">
+                                    <form id="editForm{{ loop.index0 }}">
                                         <div class="form-group">
                                             <label for="language">语言:</label>
-                                            <select class="form-control" id="editLanguage{{ index_start + loop.index0 }}" name="language" disabled>
+                                            <select class="form-control" id="editLanguage{{ loop.index0 }}" name="language" disabled>
                                                 <option value="af" {% if quiz.language == "af" %} selected {% endif %}>Afrikaans</option>
                                                 <option value="ar" {% if quiz.language == "ar" %} selected {% endif %}>Arabic</option>
                                                 <option value="zh-CN" {% if quiz.language == "zh-CN" %} selected {% endif %}>Chinese (China)</option>
@@ -169,19 +169,19 @@
                                             </select>
                                         </div>
                                         <div class="form-group">
-                                            <label for="questionInput{{ index_start + loop.index0 }}">问题</label>
-                                            <input type="text" class="form-control" id="questionInput{{ index_start + loop.index0 }}" value="{{ quiz.question }}" data-original="{{ quiz.question }}" oninput="onQuestionInputChange('{{ index_start + loop.index0 }}')" required>
-                                            <div id="message{{ index_start + loop.index0 }}" style="color: red;"></div>
+                                            <label for="questionInput{{ loop.index0 }}">问题</label>
+                                            <input type="text" class="form-control" id="questionInput{{ loop.index0 }}" value="{{ quiz.question }}" data-original="{{ quiz.question }}" oninput="onQuestionInputChange('{{ loop.index0 }}')" required>
+                                            <div id="message{{ loop.index0 }}" style="color: red;"></div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="answerInput{{ index_start + loop.index0 }}">答案</label>
-                                            <input type="text" class="form-control" id="answerInput{{ index_start + loop.index0 }}" value="{{ quiz.answer }}" required>
+                                            <label for="answerInput{{ loop.index0 }}">答案</label>
+                                            <input type="text" class="form-control" id="answerInput{{ loop.index0 }}" value="{{ quiz.answer }}" required>
                                         </div>
                                     </form>                                
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                                    <button type="button" class="btn btn-primary" onclick="saveEdit('{{ index_start + loop.index0 }}')">保存</button>
+                                    <button type="button" class="btn btn-primary" onclick="saveEdit('{{ loop.index0 }}')">保存</button>
                                 </div>
                             </div>
                         </div>
