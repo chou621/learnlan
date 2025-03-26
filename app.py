@@ -10,7 +10,8 @@ DATABASE_URL = "postgresql://learnlan_user:bLkEFJiTiF4FgWGCRWwvKikKkQfUyjJZ@dpg-
 conn = psycopg2.connect(DATABASE_URL)
 cur = conn.cursor()
 
-cur.execute("""
+cur.execute(
+    """
 CREATE TABLE IF NOT EXISTS quiz_table (
     id SERIAL PRIMARY KEY,
     language TEXT NOT NULL,
@@ -18,14 +19,17 @@ CREATE TABLE IF NOT EXISTS quiz_table (
     answer TEXT NOT NULL,
     timestamp TIMESTAMP NOT NULL
 )
-""")
+"""
+)
 conn.commit()
+
 
 @app.route("/")
 def index():
     cur.execute("SELECT * FROM quiz_table ORDER BY id DESC")
-    questions = cur.fetchall()
-    return render_template("index.html", questions=questions)
+    quizzes = cur.fetchall()
+    return render_template("index.html", quizzes=quizzes)
+
 
 @app.route("/add", methods=["POST"])
 def add():
@@ -44,9 +48,11 @@ def add():
         print("Add error:", e)
         return jsonify({"success": False, "error": str(e)})
 
+
 @app.route("/add")
 def add_page():
     return render_template("add_quiz.html")
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
