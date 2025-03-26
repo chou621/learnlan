@@ -12,60 +12,70 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
 <link rel="stylesheet" href="{{ url_for('static', filename='button.css') }}">
 </head>
-<body>
-    <h1>Add New Quiz</h1>
-    <form id="quizForm">
-        <label>Language:</label>
-        <select id="language">
-            <option value="zh-TW">Chinese (Taiwan)</option>
-            <option value="en-US">English</option>
-            <option value="ko">Korean</option>
-        </select><br><br>
+<body class="bg-light">
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Add New Quiz</h1>
+        <div class="card shadow p-4">
+            <form id="quizForm">
+                <div class="mb-3">
+                    <label for="language" class="form-label">Language:</label>
+                    <select class="form-select" id="language">
+                        <option value="zh-TW">Chinese (Taiwan)</option>
+                        <option value="en-US">English</option>
+                        <option value="ko">Korean</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="question" class="form-label">Question:</label>
+                    <input type="text" class="form-control" id="question" required>
+                </div>
+                <div class="mb-3">
+                    <label for="answer" class="form-label">Correct Answer:</label>
+                    <input type="text" class="form-control" id="answer" required>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="/" class="btn2 btn2-secondary">Back</a>
+                    <button type="submit" class="btn2 btn2-primary">Add</button>
+                </div>
+                <p id="result" class="mt-3 text-center text-danger fw-bold"></p>
+            </form>
+        </div>
+    </div>
 
-        <label>Question:</label>
-        <input type="text" id="question" required><br><br>
-
-        <label>Answer:</label>
-        <input type="text" id="answer" required><br><br>
-
-        <button type="submit">Add</button>
-    </form>
-    <p id="result"></p>
-
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 表單送出 -->
     <script>
-        document.getElementById("quizForm").addEventListener("submit", function(e) {
-            e.preventDefault();
-        
-            const language = document.getElementById("language").value;
-            const question = document.getElementById("question").value;
-            const answer = document.getElementById("answer").value;
-        
-            fetch("/add", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    language: language,
-                    question: question,
-                    answer: answer
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById("result").innerText = "✅ 新增成功！自動返回首頁...";
-                    setTimeout(() => {
-                        window.location.href = "/";
-                    }, 1500);
-                } else {
-                    document.getElementById("result").innerText = "❌ 新增失敗：" + (data.error || "請稍後再試");
-                }
-            })
-            .catch(err => {
-                document.getElementById("result").innerText = "❌ 錯誤：" + err;
-            });
+    document.getElementById("quizForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        const language = document.getElementById("language").value;
+        const question = document.getElementById("question").value;
+        const answer = document.getElementById("answer").value;
+
+        fetch("/add", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ language, question, answer })
+        })
+        .then(res => res.json())
+        .then(data => {
+            const result = document.getElementById("result");
+            if (data.success) {
+                result.innerText = "✅ 新增成功！自動返回首頁...";
+                result.classList.remove("text-danger");
+                result.classList.add("text-success");
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 1500);
+            } else {
+                result.innerText = "❌ 新增失敗：" + (data.error || "請稍後再試");
+            }
+        })
+        .catch(err => {
+            document.getElementById("result").innerText = "❌ 錯誤：" + err;
         });
-        </script>
-        </body>
-</html>
+    });
+    </script>
+</body></html>
