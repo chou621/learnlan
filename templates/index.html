@@ -11,9 +11,22 @@
             font-family: Arial, sans-serif;
             text-align: center;
             background-color: #f4f6f9;
+            margin: 0;
+            padding: 10px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
         }
         h1 {
             color: #007BFF;
+            margin: 10px 0;
         }
         table {
             margin: auto;
@@ -24,10 +37,10 @@
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            max-height: 750px; /* Set the maximum table height */
-            overflow-y: auto; /* Enable vertical scrolling */
-            margin: auto;
+            overflow-y: auto;
+            margin: 10px auto;
             width: 100%;
+            flex: 1;
         }
         th, td {
             padding: 10px;
@@ -41,24 +54,24 @@
             text-decoration: none;
         }
         .sound-icon {
-        cursor: pointer;
-        color: #007BFF;
-        margin-left: 5px;
+            cursor: pointer;
+            color: #007BFF;
+            margin-left: 5px;
         }
         .sound-text {
-        cursor: pointer;
+            cursor: pointer;
         }
-        .text-center{
+        .text-center {
             text-align: center;
-            margin-top: 10px;
+            padding: 10px 0;
+            margin-top: 0;
         }
         /* Reduce the width of the "Select All" column */
         th.text-center {
             width: 10%;
         }
         .search-bar {
-            margin-top: 10px;
-            margin-bottom: 10px;
+            margin: 10px 0;
             display: flex;
             justify-content: center;
         }
@@ -99,7 +112,7 @@
                 </thead>
                 <tbody>
                     {% for quiz in quizzes %}
-                    <tr>
+                    <tr data-question="{{ quiz.question }}">
                         <td class="align-middle" style="background-color:#E6F7FF;">
                             <label class="form-check-label" for="checkbox{{ index_start + loop.index0 }}" style="width: 100%; height: 100%; margin: 0; padding: 0;">
                                 <input type="checkbox" class="form-check-input selectCheckbox" id="checkbox{{ index_start + loop.index0 }}" data-index="{{ index_start + loop.index0 }}" style="margin: 0;">
@@ -114,19 +127,19 @@
                         </td>
                     </tr>
                         <!-- Edit Modal -->
-                        <div class="modal" id="editModal{{ index_start + loop.index0 }}" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true" onshow="onEditModalShow('{{ index_start + loop.index0 }}')">
+                        <div class="modal" id="editModal{{ index_start + loop.index0 }}" tabindex="-1" aria-labelledby="editModalLabel{{ index_start + loop.index0 }}" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
                                  <div class="modal-header">
-                                    <h5 class="modal-title" id="editModalLabel">Edit Question</h5>
+                                    <h5 class="modal-title" id="editModalLabel{{ index_start + loop.index0 }}">编辑单词</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
                                     <!-- Edit Form -->
                                     <form id="editForm{{ index_start + loop.index0 }}">
                                         <div class="form-group">
-                                            <label for="language">Language:</label>
-                                            <select class="form-control" id="editLanguage{{ index_start + loop.index0 }}" name="language" data-index="{{ index_start + loop.index0 }}" disabled>                                                
+                                            <label for="language">语言:</label>
+                                            <select class="form-control" id="editLanguage{{ index_start + loop.index0 }}" name="language" disabled>
                                                 <option value="af" {% if quiz.language == "af" %} selected {% endif %}>Afrikaans</option>
                                                 <option value="ar" {% if quiz.language == "ar" %} selected {% endif %}>Arabic</option>
                                                 <option value="zh-CN" {% if quiz.language == "zh-CN" %} selected {% endif %}>Chinese (China)</option>
@@ -152,19 +165,19 @@
                                             </select>
                                         </div>
                                         <div class="form-group">
-                                            <label for="questionInput{{ index_start + loop.index0 }}">Question</label>
-                                            <input type="text" class="form-control" id="questionInput{{ index_start + loop.index0 }}" value="{{ quiz.question }}" oninput="onQuestionInputChange('{{ index_start + loop.index0 }}')" required>
+                                            <label for="questionInput{{ index_start + loop.index0 }}">问题</label>
+                                            <input type="text" class="form-control" id="questionInput{{ index_start + loop.index0 }}" value="{{ quiz.question }}" data-original="{{ quiz.question }}" oninput="onQuestionInputChange('{{ index_start + loop.index0 }}')" required>
                                             <div id="message{{ index_start + loop.index0 }}" style="color: red;"></div>
                                         </div>
                                         <div class="form-group">
-                                            <label for="answerInput{{ index_start + loop.index0 }}">Correct Answer</label>
+                                            <label for="answerInput{{ index_start + loop.index0 }}">答案</label>
                                             <input type="text" class="form-control" id="answerInput{{ index_start + loop.index0 }}" value="{{ quiz.answer }}" required>
                                         </div>
                                     </form>                                
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="button" class="btn btn-primary" onclick="saveEdit('{{ index_start + loop.index0 }}')">Save</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                                    <button type="button" class="btn btn-primary" onclick="saveEdit('{{ index_start + loop.index0 }}')">保存</button>
                                 </div>
                             </div>
                         </div>
@@ -174,10 +187,11 @@
             </table>
             </div>
         <div class="text-center">
-            <a class="btn btn-primary" href="/add">Add Question</a>
+            <a class="btn btn-primary" href="/add" id="addQuestionBtn">Add Question</a>
             <button class="btn btn-danger" id="deleteSelectedQuizzes" style="display:inline-block" onclick="deleteSelectedQuizzes()">Delete Selected Questions</button>        
             <input type="number" id="numOfQuestionsInput" placeholder="Number of Quizzes" min="1" max="{{ quizzes|length }}" value="10" style="width: 160px; display: inline-block; text-align: center;">
             <a class="btn btn-success" href="#" onclick="startQuiz()"><i class="fas fa-play"></i> Start Quiz</a>
+            <a class="btn btn-info" href="#" onclick="startReverseQuiz()"><i class="fas fa-exchange-alt"></i> Start Reverse Quiz</a>
             <div id="inputError" style="color: red;"></div>
         </div>
     </div>
@@ -220,22 +234,29 @@ window.addEventListener("load", function () {
         }
         
 function confirmDelete(index, question, answer) {
-    if (confirm(`Are you sure you want to delete the following question?\n\nQuestion: ${question}\nAnswer: ${answer}`)) {
-        fetch("/delete/" + index, {
-            method: "DELETE",
+    if (confirm(`确定要删除这个单词吗？\n\n问题: ${question}\n答案: ${answer}`)) {
+        fetch(`/delete/${encodeURIComponent(question)}`, {
+            method: "DELETE"
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert("Deletion successful!");
-                location.reload(); // 刷新頁面以更新表格
+                // 删除成功，移除对应的行
+                const row = document.querySelector(`tr[data-question="${question}"]`);
+                if (row) {
+                    row.remove();
+                }
+                // 更新总数
+                const totalHeader = document.getElementById("totalQuestionHeader");
+                const currentCount = parseInt(totalHeader.textContent.match(/\(Total (\d+)\)/)[1]);
+                totalHeader.innerHTML = `<i class="fas fa-question-circle"></i> Question (Total ${currentCount - 1})`;
             } else {
-                alert("Deletion failed, please try again later.");
+                alert("删除失败，请重试");
             }
         })
         .catch(error => {
-            alert("Deletion failed, please try again later.");
             console.error("Error:", error);
+            alert("删除失败，请重试");
         });
     }
 }
@@ -250,55 +271,59 @@ function confirmDelete(index, question, answer) {
     function saveEdit(index) {
         const isConnected = checkInternetConnection();
 
-if (!isConnected) {
-    alert("No internet connection. Cannot save edit.");
-    return;
-}
+        if (!isConnected) {
+            alert("没有网络连接，无法保存编辑。");
+            return;
+        }
 
-  // 取得編輯表單的資料
-  const selectedLanguage = document.getElementById(`editLanguage${index}`).value;
-  const questionInput = document.getElementById("questionInput" + index).value;
-  const answerInput = document.getElementById("answerInput" + index).value;
+        // 获取编辑表单的数据
+        const questionInput = document.getElementById("questionInput" + index);
+        const question = questionInput.value;
+        const answerInput = document.getElementById("answerInput" + index).value;
+        const selectedLanguage = document.getElementById(`editLanguage${index}`).value;
+        const originalQuestion = questionInput.getAttribute("data-original");
 
-      // 檢查問題和答案是否已填寫
-      if (!questionInput || !answerInput) {
-        alert("Please fill in both Question and Correct Answer.");
-        return;
-    }
-    
-  // 建立更新的資料物件
-  const updatedQuiz = {
-    "language": selectedLanguage,
-    "question": questionInput,
-    "answer": answerInput
-  };
+        // 检查问题和答案是否已填写
+        if (!question || !answerInput) {
+            alert("请填写问题和答案。");
+            return;
+        }
 
-  // 發送更新請求到後端
-  fetch("/update/" + index, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(updatedQuiz)
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-        alert("Update successful!");
+        // 建立更新的数据对象
+        const updatedQuiz = {
+            "language": selectedLanguage,
+            "question": question,
+            "answer": answerInput
+        };
+
+        // 发送更新请求到后端
+        fetch(`/update/${encodeURIComponent(originalQuestion)}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedQuiz)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // 更新成功，刷新页面
                 location.reload();
             } else {
-                alert("Update failed, please try again later.");
+                alert(data.message || "更新失败，请重试。");
             }
         })
         .catch(error => {
-            alert("Update failed, please try again later.");
-    console.error("Error:", error);
-  });
+            console.error("Error:", error);
+            alert("更新失败，请重试。");
+        });
 
-  // 關閉Modal
-  const editModal = new bootstrap.Modal(document.getElementById("editModal" + index));
-  editModal.hide();
-}
+        // 关闭Modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById("editModal" + index));
+        if (modal) {
+            modal.hide();
+        }
+    }
   </script>
 <script>
     // 使用 fetch 函式向伺服器端發送檢查題目是否已存在的請求
@@ -401,41 +426,48 @@ selectAllCheckbox.addEventListener("click", selectAllSearchResults);
 
     // Function to delete selected quizzes
     function deleteSelectedQuizzes() {
-    const allRows = document.querySelectorAll("tbody tr");
-    const selectedIndexes = getSelectedIndexes();
-    const visibleSelectedIndexes = selectedIndexes.filter(index => {
-        const row = allRows[index];
-        return row.style.display !== "none";
-    });
+        const selectedCheckboxes = document.querySelectorAll('.selectCheckbox:checked');
+        if (selectedCheckboxes.length === 0) {
+            alert('请选择要删除的单词');
+            return;
+        }
 
-    if (visibleSelectedIndexes.length === 0) {
-        alert("No questions selected for deletion.");
-        return;
-    }
+        if (confirm(`确定要删除选中的 ${selectedCheckboxes.length} 个单词吗？`)) {
+            const questions = Array.from(selectedCheckboxes).map(checkbox => {
+                const row = checkbox.closest('tr');
+                return row.querySelector('.question-column label').textContent.trim();
+            });
 
-    if (confirm("Are you sure you want to delete the selected quizzes?")) {
-        fetch("/delete_multiple", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ indexes: visibleSelectedIndexes })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert("Deletion successful!");
-                location.reload(); // 刷新页面以更新表格
-            } else {
-                alert("Deletion failed, please try again later.");
-            }
-        })
-        .catch(error => {
-            alert("Deletion failed, please try again later.");
-            console.error("Error:", error);
-        });
+            fetch('/delete_multiple', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ questions: questions })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 删除选中的行
+                    selectedCheckboxes.forEach(checkbox => {
+                        const row = checkbox.closest('tr');
+                        row.remove();
+                    });
+                    
+                    // 更新总数
+                    const totalHeader = document.getElementById("totalQuestionHeader");
+                    const currentCount = parseInt(totalHeader.textContent.match(/\(Total (\d+)\)/)[1]);
+                    totalHeader.innerHTML = `<i class="fas fa-question-circle"></i> Question (Total ${currentCount - selectedCheckboxes.length})`;
+                } else {
+                    alert('删除失败，请重试');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('删除失败，请重试');
+            });
+        }
     }
-}
 
     // Function to select/deselect all checkboxes in the search results
 function selectAllSearchResults() {
@@ -486,6 +518,31 @@ searchInput.addEventListener("input", function () {
 totalQuestionHeader.innerHTML = `<i class="fas fa-question-circle"></i> Question (Total ${visibleCount})`;
 });
 
+</script>
+
+<script>
+// 删除之前的事件监听器代码
+// document.getElementById('addQuestionBtn').addEventListener('click', function(e) {
+//     e.preventDefault();
+//     const currentLanguage = document.getElementById('language').value;
+//     if (currentLanguage) {
+//         window.location.href = `/add?language=${encodeURIComponent(currentLanguage)}`;
+//     } else {
+//         window.location.href = '/add';
+//     }
+// });
+</script>
+
+<script>
+function startReverseQuiz() {
+    const numOfQuestionsInput = document.getElementById("numOfQuestionsInput").value;
+    if (!numOfQuestionsInput || isNaN(numOfQuestionsInput) || parseInt(numOfQuestionsInput) <= 0) {
+        const inputErrorElement = document.getElementById("inputError");
+        inputErrorElement.textContent = "请输入有效的数字";
+        return;
+    }
+    window.location.href = `/reverse_quiz?numOfQuestions=${numOfQuestionsInput}`;
+}
 </script>
 
   </body>

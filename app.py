@@ -117,72 +117,70 @@ def submit_quiz():
     )
 
 
-@app.route("/delete/<int:index>", methods=["DELETE"])
-def delete_quiz(index):
+@app.route("/delete/<path:question>", methods=["DELETE"])
+def delete_quiz(question):
     data = load_from_database()
 
-    if 0 <= index < len(data):
-        # 刪除對應的音檔
-        delete_audio_file(data[index]["question"])
+    # 查找匹配的题目
+    for index, quiz in enumerate(data):
+        if quiz["question"] == question:
+            # 删除对应的音档
+            delete_audio_file(question)
 
-        del data[index]
-        save_to_database(data)
-        return jsonify({"success": True})  # 使用 jsonify 返回 JSON 格式的回應，表示刪除成功
-    else:
-        return jsonify({"success": False}), 404  # 使用 jsonify 返回 JSON 格式的回應，表示刪除失敗
+            # 删除题目
+            del data[index]
+            save_to_database(data)
+            return jsonify({"success": True})
+
+    return jsonify({"success": False}), 404
 
 
 @app.route("/delete_multiple", methods=["POST"])
 def delete_multiple_quizzes():
     data = load_from_database()
     request_data = request.json
+    questions = request_data.get("questions", [])
 
-    selected_indexes = request_data.get("indexes", [])
-    selected_indexes = sorted([int(index) for index in selected_indexes], reverse=True)
-
-    for index in selected_indexes:
-        if 0 <= index < len(data):
-            delete_audio_file(data[index]["question"])
-            del data[index]
+    for question in questions:
+        for index, quiz in enumerate(data):
+            if quiz["question"] == question:
+                delete_audio_file(question)
+                del data[index]
+                break
 
     save_to_database(data)
-    return {"success": True}
+    return jsonify({"success": True})
 
 
-@app.route("/update/<int:index>", methods=["PUT"])
-def update_quiz(index):
+@app.route("/update/<path:old_question>", methods=["PUT"])
+def update_quiz_by_question(old_question):
     data = load_from_database()
+    updated_quiz = request.get_json()
 
-    if 0 <= index < len(data):
-        updated_quiz = request.get_json()
-        updated_language = updated_quiz["language"]
+    # 查找匹配的题目
+    for index, quiz in enumerate(data):
+        if quiz["question"] == old_question:
+            # 检查新题目是否已存在
+            if old_question != updated_quiz["question"]:
+                if any(q["question"] == updated_quiz["question"] for q in data):
+                    return jsonify(
+                        {"success": False, "message": "A same question already exists."}
+                    )
 
-        # 檢查題目是否有修改
-        old_question = data[index]["question"]
-        new_question = updated_quiz["question"]
-        if old_question != new_question:
-            # 檢查是否已有相同題目
-            if any(quiz["question"] == new_question for quiz in data):
-                return jsonify(
-                    {"success": False, "message": "A same question already exists."}
+                # 删除旧的音频文件
+                delete_audio_file(old_question)
+                # 生成新的音频文件
+                text_to_speech(
+                    updated_quiz["question"], updated_quiz["language"], audio_folder
                 )
 
-            # 刪除舊的 mp3 檔案並重新生成新的 mp3 檔案
-            old_mp3_file = os.path.join(audio_folder, old_question + ".mp3")
+            # 更新题目
+            updated_quiz["timestamp"] = datetime.now().timestamp()
+            data[index] = updated_quiz
+            save_to_database(data)
+            return jsonify({"success": True})
 
-            if os.path.exists(old_mp3_file):
-                os.remove(old_mp3_file)
-
-            text_to_speech(new_question, updated_language, audio_folder)
-
-        # Update the timestamp with the current time
-        updated_quiz["timestamp"] = datetime.now().timestamp()
-
-        data[index] = updated_quiz
-        save_to_database(data)
-        return jsonify({"success": True})
-    else:
-        return jsonify({"success": False}), 404
+    return jsonify({"success": False}), 404
 
 
 @app.route("/")
@@ -201,32 +199,36 @@ def add_quiz():
     if request.method == "POST":
         language = request.form.get("language")
         question = request.form.get("question")
-        answer_index = request.form.get("answer")  # 因為index是從0開始的，所以減1
+        answer_index = request.form.get("answer")
 
         data = load_from_database()
 
-        # 檢查是否已有相同題目
+        # 检查是否已有相同题目
         if any(quiz["question"] == question for quiz in data):
-            return "A same question already exists123."
+            return jsonify(
+                {"success": False, "message": "A same question already exists."}
+            )
 
         quiz = {
             "language": language,
             "question": question,
             "answer": answer_index,
-            "timestamp": datetime.now().timestamp(),  # 加入時間戳記欄位
+            "timestamp": datetime.now().timestamp(),
         }
 
-        # 新增這段程式碼，檢查並創建 "audio" 資料夾
+        # 新增这段程式码，检查并创建 "audio" 资料夹
         if not os.path.exists(audio_folder):
             os.makedirs(audio_folder)
 
-        # 呼叫 text_to_speech 函式，將題目轉換為語音並存成 mp3 檔案
+        # 呼叫 text_to_speech 函式，将题目转换为语音并存成 mp3 档案
         text_to_speech(question, language, audio_folder)
 
         data.append(quiz)
         save_to_database(data)
 
-        return redirect(url_for("index"))
+        return jsonify(
+            {"success": True, "quiz": quiz, "message": "Question added successfully!"}
+        )
 
     return render_template("add_quiz.html")
 
@@ -238,6 +240,31 @@ def check_duplicate_question(question):
     # 檢查資料庫中是否已經存在相同的題目
     exists = any(quiz["question"] == question for quiz in data)
     return jsonify({"exists": exists})
+
+
+@app.route("/reverse_quiz")
+def reverse_quiz():
+    num_questions = request.args.get("num_questions", default=10, type=int)
+    return render_template("reverse_quiz.html", num_questions=num_questions)
+
+
+@app.route("/get_reverse_quiz_data")
+def get_reverse_quiz_data():
+    try:
+        data = load_from_database()
+        num_questions = request.args.get("num_questions", default=10, type=int)
+
+        # 随机选择指定数量的题目
+        selected_quizzes = random.sample(data, min(num_questions, len(data)))
+
+        # 为每个题目添加语言信息
+        for quiz in selected_quizzes:
+            quiz["language"] = quiz.get("language", "en")  # 默认使用英语
+
+        return jsonify({"questions": selected_quizzes})
+    except Exception as e:
+        print(f"Error in get_reverse_quiz_data: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":

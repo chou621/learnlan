@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reverse Quiz</title>
+    <!-- 引入Bootstrap的CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 20px;
+        }
+        h1 {
+            color: #007BFF;
+            margin-bottom: 20px;
+        }
+        .quiz-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        .quiz-card {
+            max-width: 250px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .question {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            margin-top: 15px;
+        }
+        .option {
+            margin: 5px;
+        }
+        .submit-btn {
+            margin-top: 20px;
+        }
+        .icon-sound {
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        .score-section {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .score {
+            font-weight: bold;
+            color: #007BFF;
+            font-size: 24px;
+            margin: 10px 0;
+        }
+        .question-feedback {
+            margin-top: 10px;
+        }
+        .correct-answer {
+            color: green;
+            font-weight: bold;
+        }
+        .incorrect-answer {
+            color: red;
+            font-weight: bold;
+        }
+        .options input[type="radio"] {
+            pointer-events: none;
+        }
+        .incorrect-question {
+            background-color: #FFD2D2;
+        }
+        .correct-option {
+            background-color: #D1FFD2;
+        }
+        .home-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+        .refresh-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .unanswered-question {
+            background-color: #FFD2D2;
+        }
+        .incorrect-icon {
+            color: red;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <a href="{{ url_for('index') }}" class="btn btn-primary home-button"><i class="fas fa-home"></i> Back</a>
+    <button class="btn btn-primary refresh-button" onclick="refreshQuiz()"><i class="fas fa-redo"></i> Retry</button>
+    <div class="container">
+        <h1><i class="fas fa-exchange-alt"></i> Reverse Quiz</h1>
+        <div class="quiz-container" id="quizContainer">
+            <form id="quizForm">
+            <!-- 這裡會動態插入測驗題目和選項 -->
+            </form>
+        </div>
+        <button class="btn btn-success submit-btn" onclick="submitQuiz()"><i class="fas fa-check"></i> Submit Quiz</button>
+        <div class="score-section">
+            <p>Score：<span class="score" id="score">0</span> points</p>
+        </div>
+        <div class="feedback-section" id="feedbackSection">
+        </div>
+    </div>
+
+    <script>
+        function refreshQuiz() {
+            location.reload();
+        }
+
+        let quizData = [];
+        let ALL_quizData = [];
+
+        // 从服务器获取测验数据
+        fetch('/get_reverse_quiz_data')
+            .then(response => response.json())
+            .then(data => {
+                quizData = data.questions;
+                ALL_quizData = data.questions;
+                generateQuiz();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('获取测验数据失败，请重试');
+            });
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function generateQuiz() {
+            const quizContainer = document.getElementById("quizContainer");
+            quizContainer.innerHTML = "";
+
+            shuffleArray(quizData).forEach((quiz, index) => {
+                const quizCard = document.createElement("div");
+                quizCard.classList.add("quiz-card", "col-md-4");
+                quizCard.innerHTML = `
+                    <div class="question">
+                        <input class="form-check-input" type="checkbox" id="checkboxNoLabel" value="" aria-label="...">
+                        <span class="icon-number">${index + 1}</span>
+                        <label>${quiz.answer}</label>
+                    </div>
+                    <div class="options">
+                        ${generateOptions(quiz, index)}
+                    </div>
+                `;
+                quizContainer.appendChild(quizCard);
+            });
+        }
+
+        function generateOptions(quiz, index) {
+            const options = [quiz.question];
+
+            const otherQuestions = ALL_quizData
+                .filter((item) => item.question !== quiz.question)
+                .map((item) => item.question);
+            const randomOtherQuestions = shuffleArray(otherQuestions).slice(0, 3);
+            options.push(...randomOtherQuestions);
+
+            const randomizedOptions = shuffleArray(options);
+
+            let optionsHTML = "";
+            randomizedOptions.forEach((option, optionIndex) => {
+                const optionId = `option-${index}-${optionIndex}`;
+                optionsHTML += `<label class="form-check-label" for="${optionId}" onclick="removeUnansweredClass(${index})">
+                <div style="display: block;" class="form-check option">
+                <input class="form-check-input" type="radio" name="question-${index}" id="${optionId}" value="${option}">
+                ${option}
+                </div></label>`;
+            });
+            return optionsHTML;
+        }
+
+        function removeUnansweredClass(index) {
+            const questionCard = document.querySelectorAll(".quiz-card")[index];
+            questionCard.classList.remove("unanswered-question");
+        }
+
+        function playSound(text) {
+            fetch(`/play_audio/${encodeURIComponent(text)}`)
+                .then(response => response.blob())
+                .then(blob => {
+                    const audioURL = URL.createObjectURL(blob);
+                    const audio = new Audio(audioURL);
+                    audio.play();
+                })
+                .catch(error => {
+                    console.error("Unable to play audio:", error);
+                });
+        }
+
+        function submitQuiz() {
+            // Display a confirmation window
+            const confirmation = confirm("Are you sure you want to submit the quiz?");
+            if (confirmation) {
+                const totalQuestions = quizData.length;
+                let score = 0;
+                const incorrectQuestions = [];
+                const unansweredQuestions = []; // Store unanswered questions
+                incorrectQuestions.length = 0; // Clear the incorrectQuestions array before filling in new incorrect questions
+
+                // Validate that each question has been answered
+                for (let index = 0; index < totalQuestions; index++) {
+                    const options = document.querySelectorAll(`[name="question-${index}"]:checked`);
+                    if (options.length === 0) {
+                        // Mark unanswered questions
+                        const questionCard = document.querySelectorAll(".quiz-card")[index];
+                        questionCard.classList.add("unanswered-question");
+                        unansweredQuestions.push(index + 1); // Store the index of unanswered questions
+                    } else {
+                        // Remove the mark from answered questions
+                        const questionCard = document.querySelectorAll(".quiz-card")[index];
+                        questionCard.classList.remove("unanswered-question");
+
+                        const selectedOption = options[0].value;
+                        const correctOption = quizData[index].question;
+
+                        if (selectedOption === correctOption) {
+                            score++;
+                        } else {
+                            // Record incorrectly answered questions
+                            incorrectQuestions.push({ question: quizData[index].answer, answer: correctOption });
+                        }
+                    }
+                }
+
+                // Check for unanswered questions
+                if (unansweredQuestions.length > 0) {
+                    // Display an alert indicating which questions are unanswered
+                    const alertMessage = `You have not answered the following questions: ${unansweredQuestions.join(", ")}`;
+                    alert(alertMessage);
+
+                    // Mark unanswered questions
+                    unansweredQuestions.forEach((questionIndex) => {
+                        const questionCard = document.querySelectorAll(".quiz-card")[questionIndex - 1];
+                        questionCard.classList.add("unanswered-question");
+                    });
+
+                    return; // Prevent further execution of quiz submission
+                }
+
+                // Calculate and display the score
+                const percentage = (score / totalQuestions) * 100;
+                document.getElementById("score").textContent = `${score} / ${totalQuestions} (${percentage.toFixed(2)}%)`;
+
+                // Display incorrectly answered questions and mark correct options
+                incorrectQuestions.forEach((incorrectQuestion) => {
+                    // Mark correct options
+                    const questionDivs = document.querySelectorAll(".question");
+                    questionDivs.forEach((questionDiv, index) => {
+                        if (questionDiv.textContent.includes(incorrectQuestion.question)) {
+                            const optionsDiv = questionDiv.nextElementSibling;
+                            const options = optionsDiv.getElementsByClassName("form-check");
+                            const correctOption = Array.from(options).find((option) => option.textContent.trim() === incorrectQuestion.answer);
+
+                            if (correctOption) {
+                                correctOption.classList.add("correct-option");
+                            }
+                            // Add the error icon
+                            const iconHTML = `<i class="fas fa-times-circle incorrect-icon"></i>`;
+                            questionDiv.insertAdjacentHTML("afterbegin", iconHTML);
+                        }
+                    });
+                });
+
+                // Display feedback message after submission
+                const feedbackSection = document.getElementById("feedbackSection");
+                if (percentage === 100) {
+                    feedbackSection.textContent = "Congratulations! You answered correctly!";
+                    feedbackSection.style.color = "green";
+                } else if (percentage >= 60) {
+                    feedbackSection.textContent = "You have passed the quiz!";
+                    feedbackSection.style.color = "green";
+                } else {
+                    feedbackSection.textContent = "You did not pass the quiz. Please try again.";
+                    feedbackSection.style.color = "red";
+                }
+
+                // Disable all options
+                const allOptions = document.querySelectorAll('input[type="radio"]');
+                allOptions.forEach((option) => {
+                    option.disabled = true;
+                });
+
+                // Hide the submit button
+                const submitButton = document.querySelector(".submit-btn");
+                submitButton.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html> 
