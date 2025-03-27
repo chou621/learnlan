@@ -207,13 +207,14 @@
             </table>
             </div>
             <div class="d-flex flex-column flex-md-row justify-content-center align-items-center gap-2 mt-3 px-2">
-                <button class="btn btn-primary w-100 w-md-auto">Add Question</button>
-                <button class="btn btn-danger w-100 w-md-auto">Delete Selected Questions</button>
-                <input type="number" id="numOfQuestionsInput" class="form-control w-100 w-md-auto" style="max-width: 160px;" placeholder="Number of Quizzes">
-                <button class="btn btn-success w-100 w-md-auto">Start Quiz</button>
-                <button class="btn btn-info w-100 w-md-auto">Start Reverse Quiz</button>
+                <a class="btn btn-primary w-100 w-md-auto" href="/add" id="addQuestionBtn">Add Question</a>
+                <button class="btn btn-danger w-100 w-md-auto" id="deleteSelectedQuizzes" onclick="deleteSelectedQuizzes()">Delete Selected Questions</button>
+                <input type="number" id="numOfQuestionsInput" placeholder="Number of Quizzes" min="1" max="{{ quizzes|length }}" value="10"
+                    class="form-control w-100 w-md-auto text-center" style="max-width: 160px;">
+                <a class="btn btn-success w-100 w-md-auto" href="#" onclick="startQuiz()"><i class="fas fa-play"></i> Start Quiz</a>
+                <a class="btn btn-info w-100 w-md-auto" href="#" onclick="startReverseQuiz()"><i class="fas fa-exchange-alt"></i> Start Reverse Quiz</a>
+                <div id="inputError" style="color: red;"></div>
             </div>
-            
     </div>
 
 <script>
