@@ -111,28 +111,34 @@ def add_page():
     return render_template("add_quiz.html")
 
 
+from flask import send_from_directory  # 確保這行有 import
+
+
 @app.route("/play_audio/<question>")
 def play_audio(question):
-    from gtts import gTTS
-    import tempfile
-
-    # 先查出這個 question 的語言
     cur.execute("SELECT language FROM quiz_table WHERE question = %s", (question,))
     result = cur.fetchone()
+
     if not result:
-        return "Question not found", 404
+        return jsonify({"success": False, "message": "Question not found"}), 404
 
     language = result[0]
+    sanitized_question = question.replace("/", "_")  # 防止路徑錯誤
+    filename = f"{sanitized_question}.mp3"
+    filepath = os.path.join("audio", filename)
 
-    # 產生語音
-    tts = gTTS(question, lang=language)
+    # 如果音檔已經存在，直接送出
+    if os.path.exists(filepath):
+        return send_from_directory("audio", filename)
 
-    # 建立暫存檔
-    temp = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
-    tts.save(temp.name)
-    temp.close()
-
-    return send_file(temp.name, mimetype="audio/mpeg")
+    # 否則生成音檔
+    try:
+        tts = gTTS(text=question, lang=language)
+        tts.save(filepath)
+        return send_from_directory("audio", filename)
+    except Exception as e:
+        print("🔴 TTS 失敗:", e)
+        return jsonify({"success": False, "message": "語音產生失敗"}), 500
 
 
 @app.route("/get_quiz_data")
