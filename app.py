@@ -191,5 +191,20 @@ def reverse_quiz():
     return jsonify({"questions": quizData})
 
 
+def preload_all_audio():
+    cur.execute("SELECT question, language FROM quiz_table")
+    for question, lang in cur.fetchall():
+        filename = f"{question.replace('/', '_')}.mp3"
+        filepath = os.path.join("audio", filename)
+        if not os.path.exists(filepath):
+            try:
+                tts = gTTS(text=question, lang=lang)
+                tts.save(filepath)
+            except Exception as e:
+                print(f"🔴 無法為 {question} 產生語音: {e}")
+
+
+preload_all_audio()
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
