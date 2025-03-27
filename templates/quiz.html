@@ -275,23 +275,26 @@ function submitQuiz() {
         incorrectQuestionsList.innerHTML = "";
 
         incorrectQuestions.forEach((incorrectQuestion) => {
-            // Mark correct options
-            const questionDivs = document.querySelectorAll(".question");
-            questionDivs.forEach((questionDiv, index) => {
-                if (questionDiv.textContent.includes(incorrectQuestion.question)) {
-                    const optionsDiv = questionDiv.nextElementSibling;
-                    const options = optionsDiv.getElementsByClassName("form-check");
-                    const correctOption = Array.from(options).find((option) => option.textContent.trim() === incorrectQuestion.answer);
+    const questionDivs = document.querySelectorAll(".question");
+    questionDivs.forEach((questionDiv, index) => {
+        const labelText = questionDiv.querySelector("label")?.textContent?.trim();
+        if (labelText === incorrectQuestion.question.trim()) {
+            const options = questionDiv.nextElementSibling.getElementsByClassName("form-check");
+            const correctOption = Array.from(options).find(
+                (option) => option.textContent.trim() === incorrectQuestion.answer.trim()
+            );
+            if (correctOption) {
+                correctOption.classList.add("correct-option");
+            }
 
-                    if (correctOption) {
-                        correctOption.classList.add("correct-option");
-                    }
-                    // Add the error icon
-                    const iconHTML = `<i class="fas fa-times-circle incorrect-icon"></i>`;
-                    questionDiv.insertAdjacentHTML("afterbegin", iconHTML);
-                }
-            });
-        });
+            // 加入錯誤 icon（但避免重複）
+            if (!questionDiv.querySelector(".incorrect-icon")) {
+                questionDiv.insertAdjacentHTML("afterbegin", '<i class="fas fa-times-circle incorrect-icon"></i>');
+            }
+        }
+    });
+});
+
 
         // Display feedback message after submission
         const feedbackSection = document.getElementById("feedbackSection");

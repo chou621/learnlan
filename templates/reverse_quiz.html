@@ -263,24 +263,31 @@
                 document.getElementById("score").textContent = `${score} / ${totalQuestions} (${percentage.toFixed(2)}%)`;
 
                 // Display incorrectly answered questions and mark correct options
-                incorrectQuestions.forEach((incorrectQuestion) => {
-                    // Mark correct options
-                    const questionDivs = document.querySelectorAll(".question");
-                    questionDivs.forEach((questionDiv, index) => {
-                        if (questionDiv.textContent.includes(incorrectQuestion.question)) {
-                            const optionsDiv = questionDiv.nextElementSibling;
-                            const options = optionsDiv.getElementsByClassName("form-check");
-                            const correctOption = Array.from(options).find((option) => option.textContent.trim() === incorrectQuestion.answer);
+// 顯示錯誤題目時，標示正確答案並加上 icon
+incorrectQuestions.forEach((incorrectQuestion) => {
+    const questionDivs = document.querySelectorAll(".question");
+    questionDivs.forEach((questionDiv, index) => {
+        const labelText = questionDiv.querySelector("label")?.textContent?.trim();
+        if (labelText === incorrectQuestion.question.trim()) {
+            const optionsDiv = questionDiv.nextElementSibling;
+            const options = optionsDiv.getElementsByClassName("form-check");
+            const correctOption = Array.from(options).find(
+                (option) => option.textContent.trim() === incorrectQuestion.answer.trim()
+            );
 
-                            if (correctOption) {
-                                correctOption.classList.add("correct-option");
-                            }
-                            // Add the error icon
-                            const iconHTML = `<i class="fas fa-times-circle incorrect-icon"></i>`;
-                            questionDiv.insertAdjacentHTML("afterbegin", iconHTML);
-                        }
-                    });
-                });
+            if (correctOption) {
+                correctOption.classList.add("correct-option");
+            }
+
+            // 如果還沒有 icon 才插入
+            if (!questionDiv.querySelector(".incorrect-icon")) {
+                const iconHTML = `<i class="fas fa-times-circle incorrect-icon"></i>`;
+                questionDiv.insertAdjacentHTML("afterbegin", iconHTML);
+            }
+        }
+    });
+});
+
 
                 // Display feedback message after submission
                 const feedbackSection = document.getElementById("feedbackSection");
