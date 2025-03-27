@@ -135,5 +135,55 @@ def play_audio(question):
     return send_file(temp.name, mimetype="audio/mpeg")
 
 
+@app.route("/get_quiz_data")
+def get_quiz_data():
+    num = int(request.args.get("numOfQuestions", 10))
+    cur.execute("SELECT * FROM quiz_table ORDER BY RANDOM() LIMIT %s", (num,))
+    data = cur.fetchall()
+    quizzes = [
+        {"language": row[1], "question": row[2], "answer": row[3]} for row in data
+    ]
+    return jsonify({"questions": quizzes})
+
+
+@app.route("/get_reverse_quiz_data")
+def get_reverse_quiz_data():
+    cur.execute("SELECT language, question, answer FROM quiz_table")
+    rows = cur.fetchall()
+    quiz_data = [{"language": r[0], "question": r[1], "answer": r[2]} for r in rows]
+    return jsonify({"questions": quiz_data})
+
+
+@app.route("/quiz")
+def quiz():
+    num = int(request.args.get("numOfQuestions", 10))
+    cur.execute(
+        "SELECT language, question, answer FROM quiz_table ORDER BY RANDOM() LIMIT %s",
+        (num,),
+    )
+    quiz_rows = cur.fetchall()
+
+    quizData = [{"language": q[0], "question": q[1], "answer": q[2]} for q in quiz_rows]
+    cur.execute("SELECT language, question, answer FROM quiz_table")
+    all_quiz_rows = cur.fetchall()
+    ALL_quizData = [
+        {"language": q[0], "question": q[1], "answer": q[2]} for q in all_quiz_rows
+    ]
+
+    return render_template("quiz.html", quizData=quizData, ALL_quizData=ALL_quizData)
+
+
+@app.route("/reverse_quiz")
+def reverse_quiz():
+    num = int(request.args.get("numOfQuestions", 10))
+    cur.execute(
+        "SELECT language, question, answer FROM quiz_table ORDER BY RANDOM() LIMIT %s",
+        (num,),
+    )
+    quiz_rows = cur.fetchall()
+    quizData = [{"language": q[0], "question": q[1], "answer": q[2]} for q in quiz_rows]
+    return jsonify({"questions": quizData})
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
