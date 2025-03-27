@@ -154,10 +154,17 @@ def get_quiz_data():
 
 @app.route("/get_reverse_quiz_data")
 def get_reverse_quiz_data():
-    cur.execute("SELECT language, question, answer FROM quiz_table")
-    rows = cur.fetchall()
-    quiz_data = [{"language": r[0], "question": r[1], "answer": r[2]} for r in rows]
-    return jsonify({"questions": quiz_data})
+    num = int(request.args.get("numOfQuestions", 10))
+    cur.execute("SELECT * FROM quiz_table ORDER BY RANDOM() LIMIT %s", (num,))
+    quizzes = cur.fetchall()
+    return jsonify(
+        {
+            "questions": [
+                {"question": row[2], "answer": row[3], "language": row[1]}
+                for row in quizzes
+            ]
+        }
+    )
 
 
 @app.route("/quiz")
@@ -181,14 +188,7 @@ def quiz():
 
 @app.route("/reverse_quiz")
 def reverse_quiz():
-    num = int(request.args.get("numOfQuestions", 10))
-    cur.execute(
-        "SELECT language, question, answer FROM quiz_table ORDER BY RANDOM() LIMIT %s",
-        (num,),
-    )
-    quiz_rows = cur.fetchall()
-    quizData = [{"language": q[0], "question": q[1], "answer": q[2]} for q in quiz_rows]
-    return jsonify({"questions": quizData})
+    return render_template("reverse_quiz.html")
 
 
 def preload_all_audio():
