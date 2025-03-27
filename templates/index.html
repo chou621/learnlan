@@ -87,38 +87,83 @@
         #searchInput::placeholder {
             color: #999;
         }
-        
-        @media (max-width: 768px) {
+
+@media (max-width: 768px) {
+    body {
+        font-size: 18px;
+        padding: 8px;
+    }
+
+    h1 {
+        font-size: 26px;
+    }
+
+    .container {
+        padding: 0;
+    }
+
     .table-container {
         max-height: none;
         overflow-x: auto;
     }
 
-    .table th, .table td {
-        padding: 10px 5px;
-        font-size: 14px;
+    table {
+        width: 100%;
+        font-size: 16px;
+    }
+
+    th, td {
+        padding: 12px 8px;
+        font-size: 16px;
     }
 
     .search-bar {
         flex-direction: column;
         align-items: center;
+        width: 100%;
     }
 
     #searchInput {
         width: 100%;
-        margin-bottom: 10px;
+        padding: 12px;
+        font-size: 16px;
+        margin-bottom: 12px;
+    }
+
+    .text-center {
+        font-size: 18px;
+        padding: 10px;
+    }
+
+    .btn {
+        width: 100%;
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        font-size: 16px;
+        padding: 10px;
     }
 
     .d-flex.flex-column.flex-md-row {
         flex-direction: column !important;
-        gap: 10px;
+        gap: 12px;
+        align-items: stretch;
     }
 
-    .btn, .form-control {
-        width: 100% !important;
+    #numOfQuestionsInput {
+        width: 100%;
+        font-size: 16px;
+        margin-bottom: 10px;
+        padding: 8px;
     }
 
-    .text-center {
+    .modal-content {
+        font-size: 16px;
+    }
+
+    .modal-title {
         font-size: 20px;
     }
 }
